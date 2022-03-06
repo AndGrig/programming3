@@ -1,4 +1,4 @@
-class Grass {
+class Parent {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -14,6 +14,11 @@ class Grass {
             [this.x + 1, this.y + 1],
         ];
     }
+}
+
+
+class Grass extends Parent {
+
     chooseCell(character) {
         var found = [];
         for (var i in this.directions) {
@@ -45,11 +50,9 @@ class Grass {
     }
 }
 
-class GrassEater {
+class GrassEater extends Parent {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.multiply = 0;
+        super(x, y)
         this.directions = [];
         this.energy = 8;
     }
@@ -122,14 +125,19 @@ class GrassEater {
         var mushroomCell = random(mushroomCells);
         let drugCells = this.chooseCell(5)
         let drugCell = random(drugCells)
-        if(drugCell){
+        let helperCells = this.chooseCell(6)
+        let helperCell = random(helperCells)
+        if(helperCell){
+           
+        }
+        if (drugCell) {
             var newX = drugCell[0];
             var newY = drugCell[1];
             matrix[newY][newX] = 3;
 
             var newGr = new Predator(newX, newY);
             predatorArr.push(newGr);
-            
+
         }
         else if (mushroomCell) {
             this.energy += 3;
@@ -159,8 +167,8 @@ class GrassEater {
                     break;
                 }
             }
-        } 
-    
+        }
+
         else {
             this.move();
 
@@ -177,11 +185,9 @@ class GrassEater {
     }
 }
 
-class Predator {
+class Predator extends Parent {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.multiply = 0;
+        super(x, y)
         this.directions = [];
         this.energy = 15;
     }
@@ -252,13 +258,13 @@ class Predator {
         var mushroomCell = random(MushroomCells);
         let drugCells = this.chooseCell(5)
         let drugCell = random(drugCells)
-        if(drugCell){
+        if (drugCell) {
             var newX = drugCell[0];
             var newY = drugCell[1];
             matrix[newY][newX] = 2;
 
             var newGrE = new GrassEater(newX, newY);
-            grassEaterArr   .push(newGrE);
+            grassEaterArr.push(newGrE);
         }
 
         if (mushroomCell) {
@@ -303,22 +309,8 @@ class Predator {
 }
 
 
-class Mushroom {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.multiply = 0;
-        this.directions = [
-            [this.x - 1, this.y - 1],
-            [this.x, this.y - 1],
-            [this.x + 1, this.y - 1],
-            [this.x - 1, this.y],
-            [this.x + 1, this.y],
-            [this.x - 1, this.y + 1],
-            [this.x, this.y + 1],
-            [this.x + 1, this.y + 1],
-        ];
-    }
+class Mushroom extends Parent {
+
     chooseCell(character) {
         var found = [];
         for (var i in this.directions) {
@@ -349,22 +341,8 @@ class Mushroom {
     }
 }
 
-class Drug{
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.multiply = 0;
-        this.directions = [
-            [this.x - 1, this.y - 1],
-            [this.x, this.y - 1],
-            [this.x + 1, this.y - 1],
-            [this.x - 1, this.y],
-            [this.x + 1, this.y],
-            [this.x - 1, this.y + 1],
-            [this.x, this.y + 1],
-            [this.x + 1, this.y + 1],
-        ];
-    }
+class Drug extends Parent {
+
     chooseCell(character) {
         var found = [];
         for (var i in this.directions) {
@@ -388,9 +366,41 @@ class Drug{
             var newY = newCell[1];
             matrix[newY][newX] = 5;
 
-            var newDrug= new Drug (newX, newY);
+            var newDrug = new Drug(newX, newY);
             drugArr.push(newDrug);
             this.multiply = 0;
         }
     }
 }
+
+class Helper extends Parent{
+    chooseCell(character) {
+        var found = [];
+        for (var i in this.directions) {
+            var x = this.directions[i][0];
+            var y = this.directions[i][1];
+            if (x >= 0 && x < matrix[0].length && y >= 0 && y < matrix.length) {
+                if (matrix[y][x] == character) {
+                    found.push(this.directions[i]);
+                }
+            }
+        }
+        return found;
+    }
+    mul() {
+        this.multiply++;
+        var emptyCells = this.chooseCell(0);
+        var newCell = random(emptyCells);
+
+        if (newCell && this.multiply >= 50) {
+            var newX = newCell[0];
+            var newY = newCell[1];
+            matrix[newY][newX] = 5;
+
+            var newHelper = new Helper(newX, newY);
+            helperArr.push(newHelper);
+            this.multiply = 0;
+        }
+    }
+}
+
